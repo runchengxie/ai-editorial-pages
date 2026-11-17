@@ -1,0 +1,55 @@
+name: Publish website
+on:
+  schedule:
+    - cron: '37 0 * * *'
+  workflow_dispatch:
+  workflow_run:
+    workflows: [Check]
+    branches: [main]
+    types: [completed]
+permissions:
+  contents: read
+concurrency:
+  group: ai-editorial-pages-production
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.repository == 'runchengxie/ai-editorial-pages' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Require successful push checks for this main revision
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          count=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/check.yml/runs?head_sha=$GITHUB_SHA&branch=main&status=success&event=push" --jq '.workflow_runs | length')
+          test "$count" -gt 0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          package-manager-cache: false
+      - run: npm ci --no-audit --no-fund
+      - name: Validate production data and build reader
+        run: npm run build -- --out "$RUNNER_TEMP/public"
+      - uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4.0.0
+        with:
+          path: ${{ runner.temp }}/public
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4.0.5
+        id: deployment

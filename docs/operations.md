@@ -1,0 +1,32 @@
+# Setup and publication
+
+[简体中文](operations.zh-CN.md)
+
+Use Node.js 24.22.2 or later. This standalone repository has only TypeScript and browser-test development dependencies. There is no database, server, model key, collector or runtime PAT.
+
+```sh
+npm ci --no-audit --no-fund
+npm test
+npm run typecheck
+npx playwright install chromium
+npm run test:browser
+npm run build -- --fixture --out /tmp/ai-editorial-pages-preview
+# Read and validate the real public producer data:
+npm run build -- --out /tmp/ai-editorial-pages-live
+```
+
+The output directory must resolve outside the repository, including through symlinks. Retained output belongs under DATA_ROOT/ai-editorial-pages/; temporary previews may use a task directory under /tmp. Do not deploy `--fixture` output. `--input <external-json-file>` supports reproducible contract evaluations.
+
+## Production
+
+GitHub Pages uses Actions as its publishing source. The `Publish website` workflow runs at 00:37 UTC / 08:37 Shanghai daily, after the engine's 08:17 data collection target. It also supports main manual dispatch and runs after successful main `Check`. Every entry point verifies a successful push `Check` for the exact renderer revision. The temporary GitHub token is limited to reading checks and deploying this repository's Pages artifact. All source data is read over public HTTPS; no cross-repository secret is needed.
+
+The workflow validates data before building. Failed fetches, malformed inputs and latest data over 48 hours old stop deployment, preserving the previous website. A delayed producer may cause the reader to reuse the latest valid edition until its next run; inspect the source generation time displayed on the page. Publication time is not a promise of human review or fact verification. Original article titles stay in their source language; English is the interface default, and an explicit Chinese switch persists the choice.
+
+GitHub schedules may be delayed, and public repositories without activity for 60 days may have schedules disabled. Check workflow state during maintenance and re-enable if needed; manual dispatch is available. See [GitHub schedule behavior](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+
+## Repository split
+
+Merge the producer's data-only refactor before this consumer, but leave its currently deployed JSON/site untouched until this website is live. This consumer can use the existing production v1 data throughout. Then manually run producer `Daily Data` to publish JSON and old-address redirects, and run this reader again. Verify both sites, RSS, archive navigation and source timestamps. Never publish from an unmerged engine branch or temporary worktree. The legacy RSS publishes a migration notice linking the new feed; subscribers should update their URL.
+
+The engine owns collection/selection/data history; this repository owns HTML/CSS, localization, RSS and reader deployment. Reader changes no longer appear in the engine's Git history. There is no third deployment repository and no generated-data commit stream.
