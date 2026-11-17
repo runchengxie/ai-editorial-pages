@@ -5,7 +5,7 @@
   "type": "module",
   "engines": {"node": ">=24.22.2"},
   "scripts": {
-    "test": "node tests/contract.test.ts && node tests/build.test.ts",
+    "test": "node tests/contract.test.ts && node tests/build.test.ts && node src/magazine/contract.test.ts && node src/magazine/fetch.test.ts",
     "typecheck": "tsc -p .",
     "test:browser": "node tests/browser.test.ts",
     "build": "node src/build.ts"

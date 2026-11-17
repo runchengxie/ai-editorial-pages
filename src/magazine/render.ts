@@ -1,0 +1,33 @@
+import {escape} from '../render.ts';import {magazineLocales} from '../locales.ts';import type {Locale} from '../locales.ts';
+import type {Issue,Library,Block} from './contract.ts';
+export const filename=(issue:Issue,locale:Locale)=>`${issue.kind==='weekly'?'weekly-':''}${issue.end}.${locale}.html`;
+function text(value:string):string{return escape(value).replace(/\b(Claude Code|Codex|MCP|Python|SQL|CSV|API|Gemini|Qwen\d*(?:[-.]\w+)?)\b/g,'<code>$1</code>');}
+export function renderArticle(issue:Issue,library:Library,locale:Locale,exportOnly=false):string{
+ const t=magazineLocales[locale],other=locale==='en'?'zh-CN':'en';const lookup=new Map(issue.sources.map((s,i)=>[s.id,{...s,n:i+1}]));
+ const local=(b:Block)=>b[locale==='en'?'en':'zh'];
+ const citations=(b:Block)=>b.sourceIds.map(id=>`<sup><a href="${exportOnly?escape(lookup.get(id)!.url):'#source-'+escape(id)}">[${lookup.get(id)!.n}]</a></sup>`).join('');
+ const block=(b:Block)=>text(local(b))+citations(b);
+ const groups=['finance','development','general']as const;
+ const body=`<div class="issue-meta">${t[issue.kind]} · ${issue.start} — ${issue.end}<br>${t.automatic}</div><h1>${text(local(issue.title))}</h1><p class="issue-lead">${block(issue.lead)}</p><p class="issue-meta">${t.generated}: ${new Intl.DateTimeFormat(locale,{timeZone:'Asia/Shanghai',dateStyle:'medium',timeStyle:'short'}).format(new Date(issue.generatedAt))}</p>
+ <section><h2 class="section-title">${t.overview}</h2>${groups.map(group=>{const rows=issue.stories.map((s,i)=>({s,i})).filter(r=>r.s.audience===group);return rows.length?`<h3 class="group-title">${t[group]}</h3>${rows.map(({s,i})=>`<p class="overview-item"><a href="#${s.id}"><span class="number">${String(i+1).padStart(2,'0')}</span> <strong>${text(local(s.headline))}</strong></a>：${block(s.summary)}</p>`).join('')}`:'';}).join('')}</section>
+ ${groups.map(group=>{const rows=issue.stories.map((s,i)=>({s,i})).filter(r=>r.s.audience===group);return rows.length?`<section><h2 class="section-title">${t[group]}</h2>${rows.map(({s,i})=>`<article id="${s.id}"><h3 class="story-title"><span class="number">${String(i+1).padStart(2,'0')}</span><span class="title-divider">｜</span>${text(local(s.headline))}</h3>${s.paragraphs.map(p=>`<p>${block(p)}</p>`).join('')}${s.practicalNote?`<aside class="workflow-note"><h4>${t.note}</h4><p>${block(s.practicalNote)}</p></aside>`:''}${s.related.length?`<div class="related"><h4>${t.related}</h4><ul>${s.related.map(b=>`<li>${block(b)}</li>`).join('')}</ul></div>`:''}</article>`).join('')}</section>`:'';}).join('')}
+ ${issue.briefs.length?`<section><h2 class="section-title">${t.briefs}</h2><ul>${issue.briefs.map(b=>`<li>${block(b)}</li>`).join('')}</ul></section>`:''}
+ ${issue.outlook.length?`<section><h2 class="section-title">${t.outlook}</h2><ul>${issue.outlook.map(o=>`<li><strong>${o.date}</strong> · ${block(o.text)}</li>`).join('')}</ul></section>`:''}
+ <section class="source-section"><h2 class="section-title">${t.sources}</h2><ol>${issue.sources.map(s=>`<li id="source-${escape(s.id)}"><a href="${escape(s.url)}" rel="noopener noreferrer">${escape(s.title)}</a><br><span>${escape(s.source)} · ${new Intl.DateTimeFormat(locale,{timeZone:'Asia/Shanghai',dateStyle:'medium'}).format(new Date(s.publishedAt))} · ${t[s.level==='feed'?'feedEvidence':'articleEvidence']}</span></li>`).join('')}</ol><p class="issue-meta">${t.limitations}</p></section>`;
+ if(exportOnly){
+  const styled=body.replace(/<div class="issue-meta">/g,'<div style="font-size:12px;line-height:1.9;color:#85858b">').replace(/<p class="issue-meta">/g,'<p style="font-size:12px;line-height:1.9;color:#85858b;margin:0 0 24px">').replace(/<span class="number">/g,'<span style="color:#1f2f8f;font-weight:700">').replace(/<h1>/g,'<h1 style="font-size:24px;line-height:1.5;margin:16px 0 24px;color:#111">')
+   .replace(/<h2 class="section-title">/g,'<h2 style="font-size:22px;line-height:1.6;text-align:center;margin:44px 0 20px;color:#111">')
+   .replace(/<h3 class="story-title">/g,'<h3 style="font-size:20px;line-height:1.7;margin:36px 0 16px;color:#111">')
+   .replace(/<h3 class="group-title">/g,'<h3 style="font-size:14px;color:#1f2f8f;border-bottom:1px solid #d6d9ed;padding-bottom:7px;margin:26px 0 16px">')
+   .replace(/<p(?: class="[^"]*")?>/g,'<p style="font-size:15px;line-height:30px;margin:0;padding:0 0 24px;color:#1f1f1f">')
+   .replace(/<li(?: id="[^"]*")?>/g,'<li style="font-size:15px;line-height:28px;margin-bottom:10px">')
+   .replace(/<code>/g,'<code style="color:#1f2f8f;background:#f0f1f8;font-size:13px;padding:1px 4px">');
+  return `<!doctype html><html lang="${locale}"><meta charset="utf-8"><title>${escape(local(issue.title))}</title><body><section style="max-width:677px;margin:auto;padding:0 10px;font-family:-apple-system,BlinkMacSystemFont,'PingFang SC','Microsoft YaHei',sans-serif;font-size:15px;line-height:30px;color:#1f1f1f">${styled}</section></body></html>`;
+ }
+
+ return `<!doctype html><html lang="${locale}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escape(local(issue.title))} · AI Editorial</title><meta name="description" content="${escape(local(issue.lead))}"><link rel="stylesheet" href="./style.css"><link rel="alternate" type="application/rss+xml" href="./feed.xml"><script src="./language.js" defer></script></head><body><main><header><a class="brand" href="./${locale==='en'?'index':'zh-CN'}.html">AI Editorial</a><nav class="edition-nav"><a href="./${locale==='en'?'index':'zh-CN'}.html">${t.daily}</a><a href="./weekly.${locale}.html">${t.weekly}</a><a data-language="${other}" href="./${filename(issue,other)}">${other==='en'?'English':'简体中文'}</a></nav></header>${body}<nav class="archive"><h2>${t.archives}</h2>${library.issues.map(i=>`<a href="./${filename(i,locale)}">${t[i.kind]} ${i.end}</a>`).join('')}</nav><footer><a href="./export-${issue.id}.${locale}.html" download>${t.export}</a><a href="./feed.xml">${t.subscribe}</a></footer></main></body></html>`;
+}
+export function magazineRss(library:Library):string{
+ const base='https://runchengxie.github.io/ai-editorial-pages/';
+ return `<?xml version="1.0" encoding="UTF-8"?><rss version="2.0"><channel><title>AI Editorial</title><link>${base}</link><description>Source-linked daily and weekly AI editions</description>${library.issues.slice(0,30).map(i=>`<item><title>${escape(i.title.en)}</title><link>${base}${filename(i,'en')}</link><guid>${base}${filename(i,'en')}</guid><pubDate>${new Date(i.generatedAt).toUTCString()}</pubDate><description>${escape(i.lead.en)}</description></item>`).join('')}</channel></rss>`;
+}

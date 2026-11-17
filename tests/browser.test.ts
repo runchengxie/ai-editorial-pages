@@ -23,12 +23,14 @@ test('public site works on desktop/mobile, switches language, and exposes source
   assert.equal(await page.locator('html').getAttribute('lang'),'en');
   assert.equal(await page.locator('article').count(),1);
   await page.getByRole('link',{name:'简体中文'}).click();
-  assert.equal(await page.locator('html').getAttribute('lang'),'zh-CN');
+  await page.waitForURL('**/*.zh-CN.html');assert.equal(await page.locator('html').getAttribute('lang'),'zh-CN');
   await page.goto(`http://127.0.0.1:${port}/`);await page.waitForURL('**/zh-CN.html');
   await page.setViewportSize({width:390,height:844});
   assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   assert.ok(await page.getByText('未经人工审核',{exact:false}).isVisible());
   const rss=await page.request.get(`http://127.0.0.1:${port}/feed.xml`);assert.equal(rss.status(),200);assert.match(await rss.text(),/<rss/);
-  const archive=page.locator('nav a').first();await archive.click();assert.equal(await page.locator('article').count(),1);
+  await page.getByRole('link',{name:'周报',exact:true}).click();assert.ok((await page.url()).includes('weekly.'));
+  assert.ok(await page.getByRole('link',{name:'下载发布用 HTML'}).isVisible());
+  const archive=page.locator('nav.archive a').first();await archive.click();assert.equal(await page.locator('article').count(),1);
  }finally{await browser.close();await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()));await rm(out,{recursive:true});}
 });
