@@ -10,7 +10,7 @@
 
 参见[文章阅读与发布](docs/magazine.zh-CN.md)。
 
-参见[运行与发布](docs/operations.zh-CN.md)、[数据格式](docs/contract.md)及[仓库边界](AGENTS.md)。需要 Node.js 24，生成文件保存在仓库之外。
+参见[运行与发布](docs/operations.zh-CN.md)、[数据格式](docs/contract.zh-CN.md)及[仓库边界](AGENTS.md)。需要 Node.js 24，生成文件保存在仓库之外。
 
 ```sh
 npm ci

@@ -1,9 +1,3 @@
 {
-  "compilerOptions": {
-    "target": "es2023", "lib": ["es2024", "DOM"], "module": "nodenext", "moduleResolution": "nodenext",
-    "strict": true, "noUnusedLocals": true, "skipLibCheck": true, "noEmit": true,
-    "allowImportingTsExtensions": true, "verbatimModuleSyntax": true, "erasableSyntaxOnly": true,
-    "types": ["node"]
-  },
-  "include": ["src/**/*.ts", "tests/**/*.ts"]
+  "extends": "./configs/tsconfig.json"
 }

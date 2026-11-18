@@ -43,3 +43,12 @@ test('validates multiple dates independently and rejects duplicate links or sour
  const over=clone();over[0].items.push({...over[0].items[0],url:'https://example.org/b'},{...over[0].items[0],url:'https://example.org/c'});
  assert.throws(()=>validateEditions(over,now),/source item cap/);
 });
+
+test('legacy archives disclose paused publication in both languages',()=>{
+ const editions=validateEditions(clone(),now);
+ for(const [locale,notice] of [['en','Automatic updates are paused.'],['zh-CN','自动更新已暂停']] as const){
+  const html=renderPage(editions[0],editions,locale);
+  assert.ok(html.includes(notice));
+  assert.ok(!html.includes('08:17'));
+ }
+});
