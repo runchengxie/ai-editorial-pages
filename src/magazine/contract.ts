@@ -20,18 +20,18 @@ export function validateLibrary(value:unknown,now=new Date()):Library{
   if(Date.parse(generatedAt)>now.getTime()||coverageStart>=coverageEnd||Date.parse(coverageEnd)>Date.parse(generatedAt)||start>end||end>shanghaiDate(generatedAt))bad('period');
   if(kind==='weekly'&&(Date.parse(end)-Date.parse(start)!==6*DAY||new Date(start).getUTCDay()!==1||new Date(end).getUTCDay()!==0||coverageStart!==new Date(start+'T00:00:00+08:00').toISOString()||Date.parse(coverageEnd)-Date.parse(coverageStart)!==7*DAY))bad('weekly period');
   if(kind==='daily'&&(Date.parse(coverageEnd)-Date.parse(coverageStart)>72*3600000||end!==shanghaiDate(generatedAt)))bad('daily window');
-  const sources=list(r.sources,24,1).map((v:any):Source=>{
+  const sources=list(r.sources,60,1).map((v:any):Source=>{
    const s=object(v);if(!['article','feed'].includes(s.level)||!['finance','development','general'].includes(s.audience))bad('source type');
    const publishedAt=iso(s.publishedAt);if(publishedAt<coverageStart||publishedAt>=coverageEnd)bad('source date outside coverage');
    const sid=text(s.id,64);if(!/^[a-z0-9-]+$/.test(sid))bad('source identity');return {id:sid,url:link(s.url),title:text(s.title,500),source:text(s.source,500),publishedAt,level:s.level,audience:s.audience};
   });
   const sourceIds=new Set(sources.map(s=>s.id));if(sourceIds.size!==sources.length)bad('duplicate source');
   function block(v:any):Block{const b=object(v),refs=list(b.sourceIds,4,1).map(s=>text(s,64));if(refs.some(s=>!sourceIds.has(s)))bad('unknown source reference');return {en:text(b.en),zh:text(b.zh),sourceIds:[...new Set(refs)]};}
-  const storyIds=new Set<string>();const stories=list(r.stories,10,1).map((v:any):Story=>{
+  const storyIds=new Set<string>();const stories=list(r.stories,12,1).map((v:any):Story=>{
    const s=object(v),sid=text(s.id,64);if(!/^story-[1-9]\d?$/.test(sid)||storyIds.has(sid)||!['finance','development','general'].includes(s.audience))bad('story identity');storyIds.add(sid);
    return {id:sid,audience:s.audience,headline:block(s.headline),summary:block(s.summary),paragraphs:list(s.paragraphs,4,2).map(block),related:list(s.related,3).map(block),practicalNote:s.practicalNote===null?null:block(s.practicalNote)};
   });
-  return {id,kind,generatedAt,start,end,coverageStart,coverageEnd,title:block(r.title),lead:block(r.lead),stories,briefs:list(r.briefs,8).map(block),outlook:list(r.outlook,5).map(v=>{
+  return {id,kind,generatedAt,start,end,coverageStart,coverageEnd,title:block(r.title),lead:block(r.lead),stories,briefs:list(r.briefs,25).map(block),outlook:list(r.outlook,5).map(v=>{
    const d=date(object(v).date);if(d<=shanghaiDate(generatedAt)||Date.parse(d)-Date.parse(end)>365*DAY)bad('outlook date');return {date:d,text:block(v.text)};
   }),sources};
  }).sort((a,b)=>b.end.localeCompare(a.end)||a.kind.localeCompare(b.kind));

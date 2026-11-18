@@ -27,3 +27,7 @@ npm run build -- --input <v1-editions-json> --magazine-input <v2-library-json> -
 ```
 
 Fixtures are fictional and must never be published. Production builds always fetch the fixed public endpoints; they require both valid daily and weekly editions. A failed, unavailable, stale or mismatched input stops deployment and preserves the previous site. The existing08:37Shanghai reader schedule and successful-main triggers remain; the local engine also dispatches the reader when a new library is published. Local generation depends on the user's machine/Codex login; the static site remains online when that machine is off. See [operations](operations.md) for GitHub schedule maintenance.
+
+## Expanded article capacity
+
+The independent v2 validator accepts up to12 features,25 briefs and60 source references; old issues remain compatible. These are bounds, not guaranteed publication counts. Topic filtering, event merging and one model call per issue belong to the producer. Deploy this reader before publishing expanded data. Offline fixtures now exercise6 daily features/12 briefs and12 weekly features/25 briefs for long-page, numbering and mobile checks; they must not be published as news.

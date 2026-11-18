@@ -17,3 +17,9 @@ test('requires a fresh daily and a recent complete weekly edition',()=>{
 test('rejects attribute injection in public identities before rendering',()=>{
  const v=fixtureLibrary(now);v.issues[0].stories[0].id='story-1"><img src=x onerror=alert(1)>';assert.throws(()=>validateLibrary(v,now),/identity/);
 });
+test('accepts a large weekly issue and rejects over-bound features, briefs and references',()=>{
+ const v=fixtureLibrary(now),issue=v.issues.find(i=>i.kind==='weekly')!;issue.stories=Array.from({length:12},(_,i)=>({...structuredClone(issue.stories[0]),id:`story-${i+1}`}));issue.briefs=Array.from({length:25},()=>structuredClone(issue.lead));
+ issue.sources=Array.from({length:60},(_,i)=>({...structuredClone(issue.sources[0]),id:i===0?issue.sources[0].id:`extra-${i}`}));
+ assert.equal(validateLibrary(v,now).issues.find(i=>i.kind==='weekly')!.stories.length,12);
+ for(const field of ['stories','briefs','sources']as const){const copy=structuredClone(v);const w=copy.issues.find(i=>i.kind==='weekly')!;(w[field] as any[]).push({...structuredClone(w[field][0]),id:'story-13'});assert.throws(()=>validateLibrary(copy,now),/bounds/);}
+});

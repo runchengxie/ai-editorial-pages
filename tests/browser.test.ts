@@ -21,7 +21,7 @@ test('public site works on desktop/mobile, switches language, and exposes source
  try{
   const page=await browser.newPage();await page.goto(`http://127.0.0.1:${port}/`);
   assert.equal(await page.locator('html').getAttribute('lang'),'en');
-  assert.equal(await page.locator('article').count(),1);
+  assert.equal(await page.locator('article').count(),6);
   await page.getByRole('link',{name:'简体中文'}).click();
   await page.waitForURL('**/*.zh-CN.html');assert.equal(await page.locator('html').getAttribute('lang'),'zh-CN');
   await page.goto(`http://127.0.0.1:${port}/`);await page.waitForURL('**/zh-CN.html');
@@ -31,6 +31,7 @@ test('public site works on desktop/mobile, switches language, and exposes source
   const rss=await page.request.get(`http://127.0.0.1:${port}/feed.xml`);assert.equal(rss.status(),200);assert.match(await rss.text(),/<rss/);
   await page.getByRole('link',{name:'周报',exact:true}).click();assert.ok((await page.url()).includes('weekly.'));
   assert.ok(await page.getByRole('link',{name:'下载发布用 HTML'}).isVisible());
-  const archive=page.locator('nav.archive a').first();await archive.click();assert.equal(await page.locator('article').count(),1);
+  assert.equal(await page.locator('article').count(),12);assert.equal(await page.locator('.story-title .number').last().innerText(),'12');
+  const archive=page.locator('nav.archive a').first();await archive.click();assert.equal(await page.locator('article').count(),6);
  }finally{await browser.close();await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()));await rm(out,{recursive:true});}
 });

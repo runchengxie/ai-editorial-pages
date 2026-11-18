@@ -11,5 +11,7 @@ export function fixtureLibrary(now=new Date()):Library{
    stories:[{id:'story-1',audience:'finance',headline:block,summary:block,paragraphs:[block,{...block,en:'This is fixture content for layout tests, not a product announcement.',zh:'这是排版测试样例，不是真实产品公告。'}],related:[],practicalNote:null}],briefs:[block],outlook:[],
    sources:[{id:'preview',url:'https://example.org/research',title:'Preview source',source:'Example',publishedAt:new Date(Date.parse(coverageStart)+3600000).toISOString(),level:'article',audience:'finance'}]};
  }
- return {schemaVersion:2,issues:[issue('daily'),issue('weekly')]};
+ const daily=issue('daily'),weekly=issue('weekly');
+ for(const edition of [daily,weekly]){const count=edition.kind==='daily'?6:12;const prototype=edition.stories[0];edition.stories=Array.from({length:count},(_,i)=>({...structuredClone(prototype),id:`story-${i+1}`,audience:i<2?'finance':i<count-2?'development':'general',headline:{...block,en:`Preview workflow ${i+1}`,zh:`预览工作流 ${i+1}`}}));edition.briefs=Array.from({length:edition.kind==='daily'?12:25},(_,i)=>({...block,en:`Preview short update ${i+1}: fictional data for layout checks.`,zh:`预览短讯 ${i+1}：这是用于排版检查的虚构内容。`}));}
+ return {schemaVersion:2,issues:[daily,weekly]};
 }
