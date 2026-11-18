@@ -26,7 +26,7 @@ npm run build -- --fixture --out /tmp/ai-editorial-magazine-preview
 npm run build -- --input <v1-editions-json> --magazine-input <v2-library-json> --out <external-output-dir>
 ```
 
-Fixtures are fictional and must never be published. Production builds always fetch the fixed public endpoints; they require both valid daily and weekly editions. A failed, unavailable, stale or mismatched input stops deployment and preserves the previous site. The existing08:37Shanghai reader schedule and successful-main triggers remain; the local engine also dispatches the reader when a new library is published. Local generation depends on the user's machine/Codex login; the static site remains online when that machine is off. See [operations](operations.md) for GitHub schedule maintenance.
+Fixtures are fictional and must never be published. Production builds always fetch the fixed public endpoints; they require both valid daily and weekly editions. A failed, unavailable, stale or mismatched input stops deployment and preserves the previous site. Reader schedules and successful-main publication triggers are removed while evaluation is paused. Explicit manual publication remains available; a deliberate engine publication dispatches the reader. Local generation depends on the user's machine/Codex login; the static site remains online when that machine is off. See [operations](operations.md) for GitHub schedule maintenance.
 
 ## Expanded article capacity
 

@@ -19,11 +19,11 @@ npm run build -- --out /tmp/ai-editorial-pages-live
 
 ## 生产发布
 
-GitHub Pages 使用 Actions 发布源。`Publish website` 计划每天 UTC 00:37，即北京时间 08:37 运行，晚于引擎 08:17 的计划采集时间；也可在 main 手动运行，或在 main 的 `Check` 成功后触发。所有入口都核对当前网页提交的 push 检查已经成功。临时 GitHub 令牌只用于读取本仓库检查和部署 Pages；源数据走公开 HTTPS，不需要跨仓库密钥。
+GitHub Pages 使用 Actions 发布源。探索阶段 `Publish website` 只允许手动运行，不按时钟或源码检查成功自动发布。需要发布时再执行 `gh workflow run pages.yml --repo runchengxie/ai-editorial-pages --ref main`。引擎明确发布刊物时也会触发这一手动工作流。所有入口都核对当前网页提交的 push 检查已经成功。临时 GitHub 令牌只用于读取本仓库检查和部署 Pages；源数据走公开 HTTPS，不需要跨仓库密钥。
 
 构建前先校验数据。读取失败、格式错误或最新数据超过 48 小时时停止部署，保留旧站。引擎延迟时，网站可能继续使用最近一份有效数据，直到下次任务执行；请查看网页上的源数据生成时间。发布时间不代表人工审核或事实核验。文章标题保持原文，界面默认英文，可明确切换中文并记住选择。
 
-GitHub 定时任务可能延迟，公开仓库连续 60 天无活动时还可能被停用。例行维护时检查启用状态，必要时重新启用，也可手动运行。参见 [GitHub 定时说明](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule)。
+自动刷新保持暂停。引擎提供[手动检查、生成、发布和以后恢复定时任务的步骤](https://github.com/runchengxie/ai-editorial/blob/main/docs/magazine.zh-CN.md#手动探索自动化暂停)。恢复云端定时需明确修改并评审代码。长期暂停后先刷新源数据，不能绕过新鲜度检查。
 
 ## 仓库拆分
 

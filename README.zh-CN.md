@@ -2,6 +2,8 @@
 
 [English](README.md)
 
+定时发布及检查成功后的自动发布已暂停。既有内容继续在线，保留[手动发布步骤](docs/operations.zh-CN.md)。
+
 访问[每日 AI 简报](https://runchengxie.github.io/ai-editorial-pages/)，或订阅 [RSS](https://runchengxie.github.io/ai-editorial-pages/feed.xml)。本仓库负责中英双语静态网站、历史归档和网页部署；独立的 [ai-editorial 引擎](https://github.com/runchengxie/ai-editorial)负责信源、采集和筛选。
 
 网站只读取公开日报 JSON，不导入引擎源码、不查询内部后台数据库，也不调用模型。网站包含由引擎本机 Codex 任务生成的文章式日报与长文周报，正文附来源引用，并支持归档和发布用 HTML 下载。内容自动整理，未经人工审核。

@@ -19,11 +19,11 @@ The output directory must resolve outside the repository, including through syml
 
 ## Production
 
-GitHub Pages uses Actions as its publishing source. The `Publish website` workflow runs at 00:37 UTC / 08:37 Shanghai daily, after the engine's 08:17 data collection target. It also supports main manual dispatch and runs after successful main `Check`. Every entry point verifies a successful push `Check` for the exact renderer revision. The temporary GitHub token is limited to reading checks and deploying this repository's Pages artifact. All source data is read over public HTTPS; no cross-repository secret is needed.
+GitHub Pages uses Actions as its publishing source. The `Publish website` workflow is manual-only while evaluation is paused: no cron and no successful-check trigger. Run `gh workflow run pages.yml --repo runchengxie/ai-editorial-pages --ref main` only when publication is intended. A deliberate engine publication also dispatches this manual workflow. Code checks alone never publish. Every entry point verifies a successful push `Check` for the exact renderer revision. The temporary GitHub token is limited to reading checks and deploying this repository's Pages artifact. All source data is read over public HTTPS; no cross-repository secret is needed.
 
 The workflow validates data before building. Failed fetches, malformed inputs and latest data over 48 hours old stop deployment, preserving the previous website. A delayed producer may cause the reader to reuse the latest valid edition until its next run; inspect the source generation time displayed on the page. Publication time is not a promise of human review or fact verification. Original article titles stay in their source language; English is the interface default, and an explicit Chinese switch persists the choice.
 
-GitHub schedules may be delayed, and public repositories without activity for 60 days may have schedules disabled. Check workflow state during maintenance and re-enable if needed; manual dispatch is available. See [GitHub schedule behavior](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#schedule).
+Keep automatic refreshes paused. The engine documents [manual inspection, generation, publication and explicit later timer activation](https://github.com/runchengxie/ai-editorial/blob/main/docs/magazine.md#manual-evaluation-automation-paused). Restoring a cloud schedule requires a deliberate reviewed change. After a long pause, refresh producer data first; freshness checks must not be bypassed.
 
 ## Repository split
 

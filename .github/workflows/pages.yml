@@ -1,12 +1,7 @@
 name: Publish website
 on:
-  schedule:
-    - cron: '37 0 * * *'
+  # Manual-only: neither a clock nor a successful code check publishes the site.
   workflow_dispatch:
-  workflow_run:
-    workflows: [Check]
-    branches: [main]
-    types: [completed]
 permissions:
   contents: read
 concurrency:
@@ -14,7 +9,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    if: github.repository == 'runchengxie/ai-editorial-pages' && github.ref == 'refs/heads/main' && (github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success')
+    if: github.repository == 'runchengxie/ai-editorial-pages' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:

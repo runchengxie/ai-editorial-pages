@@ -26,7 +26,7 @@ npm run build -- --fixture --out /tmp/ai-editorial-magazine-preview
 npm run build -- --input <v1-editions-json> --magazine-input <v2-library-json> --out <external-output-dir>
 ```
 
-样例为虚构测试资料，不能发布。生产构建固定读取公开端点，要求日报与周报均有效；输入不可用、格式错误、过期或哈希不符时停止部署，保留旧站。原定北京时间08:37网页任务和 main 检查成功触发保持不变；本机引擎发布新刊物后也会触发网页更新。正文生成依赖用户电脑和 Codex 登录，电脑离线时静态网站仍保持在线。GitHub 定时任务维护见[运维说明](operations.zh-CN.md)。
+样例为虚构测试资料，不能发布。生产构建固定读取公开端点，要求日报与周报均有效；输入不可用、格式错误、过期或哈希不符时停止部署，保留旧站。探索阶段移除网页定时任务和 main 检查成功后的自动发布，只保留明确手动发布；本机引擎明确发布新刊物时会触发网页更新。正文生成依赖用户电脑和 Codex 登录，电脑离线时静态网站仍保持在线。GitHub 定时任务维护见[运维说明](operations.zh-CN.md)。
 
 ## 扩展内容容量
 
