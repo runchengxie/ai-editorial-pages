@@ -28,7 +28,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          count=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/check.yml/runs?head_sha=$GITHUB_SHA&branch=main&status=success&event=push" --jq '.workflow_runs | length')
+          count=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/check.yml/runs?head_sha=$GITHUB_SHA&branch=main&event=push&per_page=100" --jq "[.workflow_runs[] | select(.head_sha == \"$GITHUB_SHA\" and .head_branch == \"main\" and .event == \"push\" and .status == \"completed\" and .conclusion == \"success\")] | length")
           test "$count" -gt 0
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
