@@ -31,6 +31,9 @@ test('public site works on desktop/mobile, switches language, and exposes source
   const rss=await page.request.get(`http://127.0.0.1:${port}/feed.xml`);assert.equal(rss.status(),200);assert.match(await rss.text(),/<rss/);
   await page.getByRole('link',{name:'周报',exact:true}).click();assert.ok((await page.url()).includes('weekly.'));
   assert.ok(await page.getByRole('link',{name:'下载发布用 HTML'}).isVisible());
+  const exportHref=await page.getByRole('link',{name:'下载发布用 HTML'}).getAttribute('href');
+  const exported=await browser.newPage({viewport:{width:390,height:844}});
+  try{await exported.goto(new URL(exportHref!,page.url()).href);assert.equal(await exported.evaluate(()=>innerWidth),390);assert.ok(await exported.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));assert.ok((await exported.locator('body').innerText()).includes('CLAUDE_CODE_DISABLE_DEFERRED_TOOL_RESUME'));}finally{await exported.close();}
   assert.equal(await page.locator('article').count(),12);assert.equal(await page.locator('.story-title .number').last().innerText(),'12');
   const archive=page.locator('nav.archive a').first();await archive.click();assert.equal(await page.locator('article').count(),6);
  }finally{await browser.close();await new Promise<void>((resolve,reject)=>server.close(e=>e?reject(e):resolve()));await rm(out,{recursive:true});}
